@@ -127,8 +127,29 @@
             mediaRecorder = new MediaRecorder(stream, {
                 mimeType: 'video/webm;codecs=vp9,opus',
             });
+            // mediaRecorder.ondataavailable = e => {
+            //     recordedBlobs.push(e.data)
+            // }
             mediaRecorder.ondataavailable = e => {
-                recordedBlobs.push(e.data)
+                if (e.data && e.data.size > 0) {
+                    recordedBlobs.push(e.data)
+                    console.log('Recorded Blobs: ', recordedBlobs);
+                    const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+                    console.log('Blob: ', blob);
+                    const url = window.URL.createObjectURL(blob);
+                    console.log('URL: ', url);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'test.webm';
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }, 100);
+
+                }
             }
             mediaRecorder.start();
             console.log('MediaRecorder started', mediaRecorder.state);
@@ -141,18 +162,6 @@
 
     function stopRecording() {
         mediaRecorder.stop();
-
-        console.log('Recorded Blobs: ', recordedBlobs);
-        const blob = new Blob(recordedBlobs, { type: 'video/webm' });
-        console.log('Blob: ', blob);
-        const url = window.URL.createObjectURL(blob);
-        console.log('URL: ', url);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = 'test.webm';
-        document.body.appendChild(a);
-        //a.click();
 
     }
 
@@ -223,7 +232,7 @@
             playStream(myCamera, null)
             playStream(friendCamera, null)
         })
-        
+
 
         // socket.on('client-disconnect', data => {
         //     alert(data)

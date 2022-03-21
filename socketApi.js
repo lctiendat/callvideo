@@ -24,6 +24,9 @@ io.on('connection', socket => {
         for (let [id, socket] of io.of('/').sockets) {
             arrRoom.push(socket.idRoom)
         }
+        if (arrRoom.length > 2) {
+            arrRoom.pop()
+        }
         socket.emit('list-room', arrRoom)
     })
 
